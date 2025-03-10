@@ -16,14 +16,17 @@
 void func(int sockfd)
 {
     char buffer[80];
-    fgets(buffer, sizeof(buffer), stdin);
+    while(1)
+    {
+        fgets(buffer, sizeof(buffer), stdin);
 
-    send(sockfd, &buffer, sizeof(buffer), 0);
-    printf("Message sent\n");
-    bzero(buffer, sizeof(buffer));
+        send(sockfd, &buffer, sizeof(buffer), 0);
+        printf("Message sent\n");
+        bzero(buffer, sizeof(buffer));
 
-    recv(sockfd, &buffer, sizeof(buffer), 0);
-    printf("From server : %s\n", buffer);
+        recv(sockfd, &buffer, sizeof(buffer), 0);
+        printf("From server : %s\n", buffer);
+    }
 }
 
 int main()
