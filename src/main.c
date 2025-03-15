@@ -7,27 +7,11 @@
 #include <sys/socket.h>
 #include <unistd.h> // read(), write(), close()
 
-#include "packet.h"
+#include "client.h"
 
 #define MAX 255
 #define PORT 5087
 #define SA struct sockaddr
-
-void func(int sockfd)
-{
-    char buffer[80];
-    while(1)
-    {
-        fgets(buffer, sizeof(buffer), stdin);
-
-        send(sockfd, &buffer, sizeof(buffer), 0);
-        printf("Message sent\n");
-        bzero(buffer, sizeof(buffer));
-
-        recv(sockfd, &buffer, sizeof(buffer), 0);
-        printf("From server : %s\n", buffer);
-    }
-}
 
 int main()
 {
@@ -59,7 +43,7 @@ int main()
         printf("connected to the server..\n");
 
     // function for chat
-    func(sockfd);
+    handler(sockfd);
 
     // close the socket
     close(sockfd);
