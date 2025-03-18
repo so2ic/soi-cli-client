@@ -10,8 +10,10 @@
 #include <unistd.h>
 #include <errno.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #include "packet.h"
+#include "card.h"
 
 void handler(int sock);
 
