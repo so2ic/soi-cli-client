@@ -17,20 +17,57 @@ void handler(int sock)
         send(sock, &send_packet, sizeof(meta_t), 0);
     }
 
-
-    // we receive our base decks cards
+    // game loop
     {
-        meta_t size_info;
-        meta_t callback = (meta_t) {.type = 0xFF};
-        recv(sock, &size_info, sizeof(meta_t), 0);
-        send(sock, &callback, sizeof(meta_t), 0);
-
-        for(size_t i = 0; i < size_info.size; ++i)
+        int is_game_running = 1;
+        do
         {
-            card_t* card = (card_t*) malloc(sizeof(card_t));
-            recv(sock, card, sizeof(card_t), 0);
-            printf("CARD RECEIVED : %d\n", card->rarity);
-            send(sock, &callback, sizeof(meta_t), 0);
+            meta_t received;
+            meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
+            printf("waiting for packet\n");
+            recv(sock, &received, sizeof(meta_t), 0);
+
+            if(received.type == 0x03)
+            {
+                send(sock, &callback, sizeof(meta_t), 0);
+                receive_card(sock);
+            }
+            else
+            {
+                callback.type = 0xFE;
+                send(sock, &callback, sizeof(meta_t), 0);
+            }
         }
+        while(is_game_running);
     }
+}
+
+/*
+ * CARD RECEPTION PROCESS
+ * receive the card
+ * receive card name size
+ * allocate the card name size
+ * receive the card name
+ * receive card 
+*/
+void receive_card(int sock)
+{
+    meta_t received;
+    meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
+    card_t* card = (card_t*) malloc(sizeof(card_t));
+
+    recv(sock, card, sizeof(card_t), 0);
+    send(sock, &callback, sizeof(meta_t), 0);
+
+    recv(sock, &received, sizeof(meta_t), 0);
+    if(received.type != 0x04)
+        callback.type = 0xFE;
+    send(sock, &callback, sizeof(meta_t), 0);
+
+    printf("%zu\n", received.size);
+    char* buf = malloc(received.size);
+    recv(sock, buf, received.size, 0);
+    send(sock, &callback, sizeof(meta_t), 0);
+
+    printf("CARD RECEIVED : %s\n", buf);
 }

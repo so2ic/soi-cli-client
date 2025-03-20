@@ -16,5 +16,6 @@
 #include "card.h"
 
 void handler(int sock);
+void receive_card(int sock);
 
 #endif // CLIENT_H
