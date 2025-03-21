@@ -19,18 +19,43 @@ void handler(int sock)
 
     // game loop
     {
+        ll_t* deck = ll_init();
         int is_game_running = 1;
         do
         {
             meta_t received;
             meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
-            printf("waiting for packet\n");
+            system("clear");
+            for(int i = 0; i < deck->count; ++i)
+            {
+                printf("[%d] -> ", i); 
+                display_card((card_t*) ll_get_data_at(deck, i));
+            }
             recv(sock, &received, sizeof(meta_t), 0);
 
             if(received.type == 0x03)
             {
                 send(sock, &callback, sizeof(meta_t), 0);
-                receive_card(sock);
+                receive_card(sock, deck);
+            }
+            else if(received.type == 0x02)
+            {
+                int is_running = 1;
+                do
+                {
+                    int choice;
+                    int card_place;
+                    printf("You have to play\nDo you wanna :\n1 - Get info on a card\n2 - Play a card\nYour choice : "); 
+                    scanf("%d", &choice);
+                    printf("Select the card you want to %s\nYour choice : ", (choice == 1) ? "inspect" : "play");
+                    scanf("%d", &card_place);
+                    if(choice == 1)
+                        display_card_info(ll_get_data_at(deck, choice));
+                    else if(choice == 2)
+                        is_running = 0;
+ 
+                }
+                while(is_running);
             }
             else
             {
@@ -48,9 +73,8 @@ void handler(int sock)
  * receive card name size
  * allocate the card name size
  * receive the card name
- * receive card 
 */
-void receive_card(int sock)
+void receive_card(int sock, ll_t* deck)
 {
     meta_t received;
     meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
@@ -64,10 +88,8 @@ void receive_card(int sock)
         callback.type = 0xFE;
     send(sock, &callback, sizeof(meta_t), 0);
 
-    printf("%zu\n", received.size);
-    char* buf = malloc(received.size);
-    recv(sock, buf, received.size, 0);
+    recv(sock, card->name, received.size, 0);
     send(sock, &callback, sizeof(meta_t), 0);
 
-    printf("CARD RECEIVED : %s\n", buf);
+    ll_insert(deck, card);
 }

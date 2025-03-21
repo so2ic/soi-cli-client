@@ -14,8 +14,9 @@
 
 #include "packet.h"
 #include "card.h"
+#include "data_structures/ll.h"
 
 void handler(int sock);
-void receive_card(int sock);
+void receive_card(int sock, ll_t* deck);
 
 #endif // CLIENT_H
