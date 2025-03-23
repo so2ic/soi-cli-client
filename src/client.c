@@ -50,7 +50,7 @@ void handler(int sock)
                     printf("Select the card you want to %s\nYour choice : ", (choice == 1) ? "inspect" : "play");
                     scanf("%d", &card_place);
                     if(choice == 1)
-                        display_card_info(ll_get_data_at(deck, choice));
+                        display_card_info(ll_get_data_at(deck, card_place));
                     else if(choice == 2)
                         is_running = 0;
  
