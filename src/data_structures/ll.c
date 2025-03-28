@@ -116,3 +116,7 @@ int ll_insert_at(ll_t* l, void* data, int place)
     return 0;
 }
 
+int ll_get_size(ll_t* l)
+{
+    return l->count;
+}

@@ -16,6 +16,7 @@
 #include "card.h"
 #include "data_structures/ll.h"
 #include "player.h"
+#include "interface.h"
 
 void handler(int sock);
 void receive_card(int sock, ll_t* deck);

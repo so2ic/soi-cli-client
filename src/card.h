@@ -27,6 +27,8 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef enum CARD_TYPE
 {
@@ -56,6 +58,6 @@ char* get_card_color(CARD_CLASS class);
 char* get_card_type_string(CARD_TYPE type);
 char* get_card_class_string(CARD_CLASS class);
 void display_card_info(card_t* card);
-void display_card(card_t* card);
+char* display_card(card_t* card);
 
 #endif // CARD_H

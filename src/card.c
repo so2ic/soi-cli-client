@@ -16,18 +16,20 @@ char* get_card_color(CARD_CLASS class)
     return KNRM;
 }
 
-void display_card(card_t* card)
+char* display_card(card_t* card)
 {
-   char* color = get_card_color(card->class); 
-
-    printf("%s%s\n",color, card->name);
+    char* out = malloc(strlen(get_card_color(card->class)) + strlen(card->name)); 
+    strcpy(out, get_card_color(card->class));
+    strcat(out, card->name);
+    return out;
 }
 
 void display_card_info(card_t* card)
 {
     char* color = get_card_color(card->class);
     printf("\n==========CARD==========\n");
-    printf("%sNAME : %s\nID : %d\n", color, card->name, card->id);
+    printf("%sNAME : %s\nID : %d\n", color, card->name, 1);
+    /*
     if(card->mana != 0)
         printf("%sMANA : %d\n", color, card->mana);
     if(card->power != 0)
@@ -38,6 +40,7 @@ void display_card_info(card_t* card)
         printf("%sRARITY : %d\n", color, card->rarity);
     printf("%sCARD_TYPE : %s\n", color, get_card_type_string(card->type));
     printf("%sCARD_CLASS: %s\n", color, get_card_class_string(card->class));
+    */
     printf("=========================\n\n");
 }
 

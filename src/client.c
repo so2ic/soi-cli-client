@@ -20,55 +20,40 @@ void handler(int sock)
 
     // game loop
     {
-        ll_t* deck = ll_init();
+        enable_raw_mode();
+        ll_t* hand = ll_init();
         int is_game_running = 1;
         do
         {
             meta_t received;
             meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
-            system("clear");
-            display_player(&player);
-            for(int i = 0; i < deck->count; ++i)
-            {
-                printf("[%d] -> ", i); 
-                display_card((card_t*) ll_get_data_at(deck, i));
-            }
             recv(sock, &received, sizeof(meta_t), 0);
 
             if(received.type == 0x03)
             {
                 send(sock, &callback, sizeof(meta_t), 0);
-                receive_card(sock, deck);
+                receive_card(sock, hand);
+                bzero(&received, sizeof(meta_t));
             }
             else if(received.type == 0x02)
             {
                 int is_running = 1;
-                do
-                {
-                    int choice;
-                    int card_place;
-                    printf("You have to play\nDo you wanna :\n1 - Get info on a card\n2 - Play a card\nYour choice : "); 
-                    scanf("%d", &choice);
-                    printf("Select the card you want to %s\nYour choice : ", (choice == 1) ? "inspect" : "play");
-                    scanf("%d", &card_place);
-                    if(choice == 1)
-                        display_card_info(ll_get_data_at(deck, card_place));
-                    else if(choice == 2)
-                        is_running = 0;
- 
-                }
-                while(is_running);
+
+                card_t* played_card = interface_handler(&player, hand);
+                bzero(&received, sizeof(meta_t));
             }
             else if(received.type == 0x05)
             {
                 meta_t callback = {.type = 0xFF, .size = 0};
                 player.hp = (int) received.size;
+                bzero(&received, sizeof(meta_t));
                 send(sock, &callback, sizeof(meta_t), 0);
             }
             else if(received.type == 0x06)
             {
                 meta_t callback = {.type = 0xFF, .size = 0};
                 player.mana = (int) received.size;
+                bzero(&received, sizeof(meta_t));
                 send(sock, &callback, sizeof(meta_t), 0);
             }
             else if(received.type == 0x07)
@@ -76,15 +61,24 @@ void handler(int sock)
                 meta_t callback = {.type = 0xFF, .size = 0};
                 player.power = (int) received.size;
                 send(sock, &callback, sizeof(meta_t), 0);
+                bzero(&received, sizeof(meta_t));
             }
             else if(received.type == 0x08)
             {
                 meta_t callback = {.type = 0xFF, .size = 0};
                 player.mastery = (int) received.size;
                 send(sock, &callback, sizeof(meta_t), 0);
+                bzero(&received, sizeof(meta_t));
+            }
+            // for second player so he can see his hand
+            else if(received.type == 0x09)
+            {
+                
             }
             else
             {
+                //printf("SHOULD NOT GO HERE\n");
+                //printf("BECAUSE OF : %hhu\n", received.type);
                 callback.type = 0xFE;
                 send(sock, &callback, sizeof(meta_t), 0);
             }
@@ -106,12 +100,15 @@ void receive_card(int sock, ll_t* deck)
     meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
     card_t* card = (card_t*) malloc(sizeof(card_t));
 
+    /*
     recv(sock, card, sizeof(card_t), 0);
     send(sock, &callback, sizeof(meta_t), 0);
+    */
 
     recv(sock, &received, sizeof(meta_t), 0);
     if(received.type != 0x04)
         callback.type = 0xFE;
+    card->name = malloc(received.size);
     send(sock, &callback, sizeof(meta_t), 0);
 
     recv(sock, card->name, received.size, 0);
