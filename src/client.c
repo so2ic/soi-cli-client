@@ -37,10 +37,34 @@ void handler(int sock)
             }
             else if(received.type == 0x02)
             {
-                int is_running = 1;
+                send(sock, &callback, sizeof(meta_t), 0);
+                meta_t send_packet = {.type = 0x03, .size = 0};
 
                 card_t* played_card = interface_handler(&player, hand);
                 bzero(&received, sizeof(meta_t));
+
+                send(sock, &send_packet, sizeof(meta_t), 0);
+                recv(sock, &received, sizeof(meta_t), 0);
+
+                if(received.type != 0xFF)
+                {
+                    // TODO
+                    // Handle errors 
+                    perror("error while sending card to server");
+                    exit(errno);
+                }
+                
+                bzero(&received, sizeof(meta_t));
+                send(sock, &(played_card->id), sizeof(int), 0);
+                recv(sock, &received, sizeof(meta_t), 0);
+
+                if(received.type != 0xFF)
+                {
+                    // TODO
+                    // Handle errors
+                    perror("error while sending card id to server"); 
+                    exit(errno);
+                }
             }
             else if(received.type == 0x05)
             {
