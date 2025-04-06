@@ -14,6 +14,6 @@ void disable_raw_mode();
 void clear_screen();
 void card_menu(player_t* p, ll_t* hand, int selected);
 void card_info_menu(player_t* p, card_t* card);
-card_t* interface_handler(player_t* player, ll_t* hand);
+card_t* interface_handler(player_t* player, ll_t* hand, int is_playing);
 
 #endif // INTERFACE_H

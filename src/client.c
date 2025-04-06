@@ -23,11 +23,14 @@ void handler(int sock)
         enable_raw_mode();
         ll_t* hand = ll_init();
         int is_game_running = 1;
+        
         do
         {
             meta_t received;
             meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
             recv(sock, &received, sizeof(meta_t), 0);
+
+            interface_handler(&player, hand, 0);
 
             if(received.type == 0x03)
             {
@@ -40,7 +43,7 @@ void handler(int sock)
                 send(sock, &callback, sizeof(meta_t), 0);
                 meta_t send_packet = {.type = 0x03, .size = 0};
 
-                card_t* played_card = interface_handler(&player, hand);
+                card_t* played_card = interface_handler(&player, hand, 1);
                 bzero(&received, sizeof(meta_t));
 
                 send(sock, &send_packet, sizeof(meta_t), 0);
@@ -99,6 +102,15 @@ void handler(int sock)
             {
                 
             }
+            else if(received.type == 0x0A)
+            {
+                meta_t callback = {.type = 0xFF, .size = 0};
+                int err = ll_remove_at(hand, received.size);
+                if(err)
+                    callback.type = 0xFE;
+                send(sock, &callback, sizeof(meta_t), 0);
+                bzero(&received, sizeof(meta_t));
+            }
             else
             {
                 //printf("SHOULD NOT GO HERE\n");
@@ -128,6 +140,12 @@ void receive_card(int sock, ll_t* deck)
     recv(sock, card, sizeof(card_t), 0);
     send(sock, &callback, sizeof(meta_t), 0);
     */
+
+    recv(sock, &received, sizeof(meta_t), 0);
+    if(received.type != 0x09)
+        callback.type = 0xFE;
+    card->id = (int) received.size;
+    send(sock, &callback, sizeof(meta_t), 0);
 
     recv(sock, &received, sizeof(meta_t), 0);
     if(received.type != 0x04)

@@ -42,37 +42,43 @@ void card_info_menu(player_t* p, card_t* card)
     display_card_info(card);
 }
 
-card_t* interface_handler(player_t* player, ll_t* hand)
+card_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
 {
     int selected = 0;
     int is_info = 0;
     char c;
-    while(1)
+    
+    if(!is_playing)
+        card_menu(player, hand, selected);
+    else
     {
-        if(!is_info)
+        while(1)
         {
-            card_menu(player, hand, selected);
-            c = getchar();
+            if(!is_info)
+            {
+                card_menu(player, hand, selected);
+                c = getchar();
 
-            if(c == 's')
-                if(selected < ll_get_size(hand) - 1)
-                    ++selected;
-            if(c == 'z')
-                if(selected > 0)
-                    --selected;
-            if(c == '\n')
-                is_info = 1;
-        }
-        else
-        {
-            card_info_menu(player, ll_get_data_at(hand, selected));
-
-            c = getchar();
-
-            if(c == '\n')
-                return ll_get_data_at(hand, selected);
+                if(c == 's')
+                    if(selected < ll_get_size(hand) - 1)
+                        ++selected;
+                if(c == 'z')
+                    if(selected > 0)
+                        --selected;
+                if(c == '\n')
+                    is_info = 1;
+            }
             else
-                is_info = 0;
-        }
+            {
+                card_info_menu(player, ll_get_data_at(hand, selected));
+
+                c = getchar();
+
+                if(c == '\n')
+                    return ll_get_data_at(hand, selected);
+                else
+                    is_info = 0;
+            }
+        }  
     }
 }
