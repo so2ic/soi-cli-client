@@ -10,7 +10,7 @@
 #include "client.h"
 
 #define MAX 255
-#define PORT 5086
+#define PORT 5090
 #define SA struct sockaddr
 
 int main()

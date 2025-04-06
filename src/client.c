@@ -28,9 +28,10 @@ void handler(int sock)
         {
             meta_t received;
             meta_t callback = (meta_t) {.type = 0xFF, .size = 0};
-            recv(sock, &received, sizeof(meta_t), 0);
 
             interface_handler(&player, hand, 0);
+
+            recv(sock, &received, sizeof(meta_t), 0);
 
             if(received.type == 0x03)
             {
@@ -43,30 +44,74 @@ void handler(int sock)
                 send(sock, &callback, sizeof(meta_t), 0);
                 meta_t send_packet = {.type = 0x03, .size = 0};
 
-                card_t* played_card = interface_handler(&player, hand, 1);
+                return_t* out = interface_handler(&player, hand, 1);
                 bzero(&received, sizeof(meta_t));
 
-                send(sock, &send_packet, sizeof(meta_t), 0);
-                recv(sock, &received, sizeof(meta_t), 0);
-
-                if(received.type != 0xFF)
+                if(out->type == (RETURN_TYPE) CARD)
                 {
-                    // TODO
-                    // Handle errors 
-                    perror("error while sending card to server");
-                    exit(errno);
+                    card_t* played_card = out->card; 
+                    send(sock, &send_packet, sizeof(meta_t), 0);
+                    recv(sock, &received, sizeof(meta_t), 0);
+
+                    if(received.type != 0xFF)
+                    {
+                        // TODO
+                        // Handle errors 
+                        perror("error while sending card to server");
+                        exit(errno);
+                    }
+                    
+                    bzero(&received, sizeof(meta_t));
+                    send(sock, &(played_card->id), sizeof(int), 0);
+                    recv(sock, &received, sizeof(meta_t), 0);
+
+                    if(received.type != 0xFF)
+                    {
+                        // TODO
+                        // Handle errors
+                        perror("error while sending card id to server"); 
+                        exit(errno);
+                    } 
                 }
-                
-                bzero(&received, sizeof(meta_t));
-                send(sock, &(played_card->id), sizeof(int), 0);
-                recv(sock, &received, sizeof(meta_t), 0);
-
-                if(received.type != 0xFF)
+                else if(out->type == (RETURN_TYPE) MASTERY)
                 {
-                    // TODO
-                    // Handle errors
-                    perror("error while sending card id to server"); 
-                    exit(errno);
+                    send_packet.type = 0x0C;
+
+                    send(sock, &send_packet, sizeof(meta_t), 0);
+                    recv(sock, &received, sizeof(meta_t), 0);
+
+                    if(received.type != 0xFF)
+                    {
+                        perror("error while upgrading mastery");
+                        exit(errno);
+                    }
+                }
+                else if(out->type == (RETURN_TYPE) DAMAGE)
+                {
+                    send_packet.type = 0x0D;
+                    send_packet.size = (size_t) out->value;
+
+                    send(sock, &send_packet, sizeof(meta_t), 0);
+                    recv(sock, &received, sizeof(meta_t), 0);
+
+                    if(received.type != 0xFF)
+                    {
+                        perror("error while dealing damage");
+                        exit(errno);
+                    }
+                }
+                else
+                {
+                    send_packet.type = 0x0B;
+
+                    send(sock, &send_packet, sizeof(meta_t), 0);
+                    recv(sock, &received, sizeof(meta_t), 0);
+
+                    if(received.type != 0xFF)
+                    {
+                        perror("error while sending end of turn");
+                        exit(errno);
+                    }
                 }
             }
             else if(received.type == 0x05)
