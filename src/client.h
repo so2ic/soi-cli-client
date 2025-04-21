@@ -20,7 +20,7 @@
 #include "types.h"
 #include "enums.h"
 
-void handler(int sock);
+int handler(int sock);
 void receive_card(int sock, ll_t* deck);
 
 #endif // CLIENT_H

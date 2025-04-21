@@ -42,8 +42,12 @@ int main()
     else
         printf("connected to the server..\n");
 
-    // function for chat
-    handler(sockfd);
+    while(1)
+    {
+        int close = handler(sockfd);
+        if(close) 
+            break;
+    }
 
     // close the socket
     close(sockfd);

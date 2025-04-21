@@ -3,7 +3,7 @@
 /* TO SEE SOCKET SENDING STEP
  * READ "server.c" ON SERVER REPO
 */
-void handler(int sock)
+int handler(int sock)
 {
     player_t player = (player_t) {.hp = 0, .mana = 0, .power = 0, .mastery = 0};
     printf("Waiting for other player\n");
@@ -166,6 +166,12 @@ void handler(int sock)
                 send(sock, &callback, sizeof(meta_t), 0);
                 bzero(&received, sizeof(meta_t));
             }
+            else if(received.type == 0x0F)
+            {
+                // TODO
+                // handle deconnection properly
+                return 0;
+            }
             else
             {
                 //printf("SHOULD NOT GO HERE\n");
@@ -176,6 +182,8 @@ void handler(int sock)
         }
         while(is_game_running);
     }
+
+    return 1;
 }
 
 /*
