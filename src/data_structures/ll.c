@@ -120,3 +120,19 @@ int ll_get_size(ll_t* l)
 {
     return l->count;
 }
+
+int ll_empty(ll_t* l)
+{
+    if(l == NULL)
+        return 1;
+    
+    int c = l->count;
+    for(int i = 0; i < c; ++i)
+    {
+        int err = ll_remove_at(l, 0);
+        if(err)
+            return 1;
+    }
+
+    return 0;
+}

@@ -1,16 +1,16 @@
-#include <arpa/inet.h> // inet_addr()
+#include <arpa/inet.h> 
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h> // bzero()
+#include <strings.h>
 #include <sys/socket.h>
-#include <unistd.h> // read(), write(), close()
+#include <unistd.h>
 
 #include "client.h"
 
 #define MAX 255
-#define PORT 5090
+#define PORT 5093
 #define SA struct sockaddr
 
 int main()

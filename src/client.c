@@ -156,6 +156,16 @@ void handler(int sock)
                 send(sock, &callback, sizeof(meta_t), 0);
                 bzero(&received, sizeof(meta_t));
             }
+            else if(received.type == 0x0E)
+            {
+                meta_t callback = {.type = 0xFF, .size = 0};
+                int err = ll_empty(hand);
+                if(err)
+                    callback.type = 0xFE;
+
+                send(sock, &callback, sizeof(meta_t), 0);
+                bzero(&received, sizeof(meta_t));
+            }
             else
             {
                 //printf("SHOULD NOT GO HERE\n");
