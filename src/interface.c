@@ -68,7 +68,7 @@ return_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
     int selected = 0, damage = 0;
     int is_info = 0, is_damage = 0;
     char c;
-    return_t ret;
+    return_t* ret = (return_t*) malloc(sizeof(return_t));
     
     if(!is_playing)
         card_menu(player, hand, selected);
@@ -84,9 +84,9 @@ return_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
 
                 if(c == '\n')
                 {
-                    ret.type = (RETURN_TYPE) CARD;
-                    ret.card = ll_get_data_at(hand, selected); 
-                    return &ret;
+                    ret->type = (RETURN_TYPE) CARD;
+                    ret->card = ll_get_data_at(hand, selected); 
+                    return ret;
                 }
                 else
                     is_info = 0;
@@ -111,10 +111,10 @@ return_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
                 }
                 else if(c == '\n')
                 {
-                    ret.type = (RETURN_TYPE) DAMAGE; 
-                    ret.card = NULL;
-                    ret.value = damage;
-                    return &ret;
+                    ret->type = (RETURN_TYPE) DAMAGE; 
+                    ret->card = NULL;
+                    ret->value = damage;
+                    return ret;
                 }
                 else
                     is_damage = 0;
@@ -142,15 +142,15 @@ return_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
                 {
                     if(selected == -1) 
                     {
-                        ret.type = (RETURN_TYPE) END_TURN;
-                        ret.card = NULL;
-                        return &ret;
+                        ret->type = (RETURN_TYPE) END_TURN;
+                        ret->card = NULL;
+                        return ret;
                     }
                     else if(selected == -2)
                     {
-                        ret.type = (RETURN_TYPE) MASTERY;
-                        ret.card = NULL;
-                        return &ret;
+                        ret->type = (RETURN_TYPE) MASTERY;
+                        ret->card = NULL;
+                        return ret;
                     }
                     else if(selected == -3)
                     {
@@ -166,4 +166,5 @@ return_t* interface_handler(player_t* player, ll_t* hand, int is_playing)
             }
         }  
     }
+    return ret;
 }
